@@ -349,11 +349,11 @@
       "eventLocation": "Test Arena",
       "status": "active",
       "createdAt": "2025-10-25T19:45:33.360Z",
-      "updatedAt": "2025-10-25T19:45:44.003Z",
+      "updatedAt": "2025-10-25T20:25:59.793Z",
       "collectionNftAddress": "CR6wcxexGpd8WEXMSQg1Bgjt5mYV9FLtJLRjQ2Zw4Udz",
       "candyMachineAddress": "8rVpkqC55YWTL83r9rLCfVyL1LRoeQ5MgGNnz7jNwFed",
       "candyMachineConfig": {
-        "minted": 1
+        "minted": 5
       }
     }
   ]

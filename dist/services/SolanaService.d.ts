@@ -8,6 +8,7 @@ export declare class SolanaService {
     constructor(config: PlatformConfig);
     getConnection(): Connection;
     getMetaplex(): Metaplex;
+    createMetaplexForUser(userKeypair: Keypair): Metaplex;
     getKeypair(): Keypair;
     getWalletAddress(): string;
     getBalance(): Promise<number>;

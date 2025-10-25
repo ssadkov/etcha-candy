@@ -182,10 +182,11 @@ class CandyMachineService {
                 throw new Error('Test wallet not found');
             }
             const userKeypair = this.createKeypairFromPrivateKey(testWallet.privateKey);
-            const metaplex = this.solanaService.getMetaplex();
+            const userMetaplex = this.solanaService.createMetaplexForUser(userKeypair);
             const userBalance = await this.solanaService.getConnection().getBalance(userKeypair.publicKey);
             const userBalanceSOL = userBalance / 1e9;
             console.log('💰 User wallet balance:', userBalanceSOL, 'SOL');
+            console.log('👤 User wallet address:', userKeypair.publicKey.toBase58());
             if (userBalanceSOL < collection.ticketPrice * quantity) {
                 throw new Error(`Insufficient SOL balance. Required: ${collection.ticketPrice * quantity} SOL, Available: ${userBalanceSOL} SOL`);
             }
@@ -201,11 +202,11 @@ class CandyMachineService {
                 const candyMachinePublicKey = new web3_js_1.PublicKey(candyMachineAddress);
                 console.log('🔍 PublicKey created successfully:', candyMachinePublicKey.toBase58());
                 console.log('🔍 Searching for Candy Machine on blockchain...');
-                const candyMachine = await metaplex.candyMachines().findByAddress({
+                const candyMachine = await userMetaplex.candyMachines().findByAddress({
                     address: candyMachinePublicKey,
                 });
                 console.log('✅ Candy Machine found on blockchain!');
-                const mintResult = await metaplex.candyMachines().mint({
+                const mintResult = await userMetaplex.candyMachines().mint({
                     candyMachine,
                     collectionUpdateAuthority: this.solanaService.getKeypair().publicKey,
                 });

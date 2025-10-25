@@ -24,6 +24,10 @@ class SolanaService {
     getMetaplex() {
         return this.metaplex;
     }
+    createMetaplexForUser(userKeypair) {
+        return js_1.Metaplex.make(this.connection)
+            .use((0, js_1.keypairIdentity)(userKeypair));
+    }
     getKeypair() {
         return this.keypair;
     }

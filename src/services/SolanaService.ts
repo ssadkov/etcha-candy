@@ -36,6 +36,11 @@ export class SolanaService {
     return this.metaplex;
   }
 
+  createMetaplexForUser(userKeypair: Keypair): Metaplex {
+    return Metaplex.make(this.connection)
+      .use(keypairIdentity(userKeypair));
+  }
+
   getKeypair(): Keypair {
     return this.keypair;
   }
