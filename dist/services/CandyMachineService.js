@@ -109,6 +109,9 @@ class CandyMachineService {
                 number: candyMachineConfig.number,
                 collection: collection.collectionNftAddress
             });
+            console.log('🔍 Debug - collection.ticketPrice:', collection.ticketPrice);
+            console.log('🔍 Debug - candyMachineConfig.price:', candyMachineConfig.price);
+            console.log('🔍 Debug - typeof candyMachineConfig.price:', typeof candyMachineConfig.price);
             const candyMachine = await metaplex.candyMachines().create({
                 itemsAvailable: candyMachineConfig.number,
                 sellerFeeBasisPoints: candyMachineConfig.sellerFeeBasisPoints,
@@ -117,7 +120,13 @@ class CandyMachineService {
                 collection: candyMachineConfig.collection,
                 guards: {
                     solPayment: {
-                        amount: candyMachineConfig.price,
+                        amount: {
+                            basisPoints: BigInt(Math.floor(candyMachineConfig.price * 1e9)),
+                            currency: {
+                                symbol: 'SOL',
+                                decimals: 9,
+                            },
+                        },
                         destination: this.solanaService.getKeypair().publicKey,
                     },
                 },

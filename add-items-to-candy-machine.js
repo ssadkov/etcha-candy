@@ -1,44 +1,40 @@
-console.log('🎫 Adding items to existing Candy Machine...');
-console.log('==================================\n');
-
-const API_BASE_URL = 'http://localhost:3000';
+const axios = require('axios');
 
 async function addItemsToCandyMachine() {
   try {
-    // Collection with Candy Machine
-    const collectionId = 'collection_1761415240951_mdvi5yqwt'; // FIXED Collection NFT
-    
     console.log('🎫 Adding items to Candy Machine...');
-    console.log(`   Collection ID: ${collectionId}`);
-    console.log('');
-
-    const addItemsRequest = {
+    
+    const collectionId = 'collection_1761426689709_s5xgkn31k';
+    
+    console.log('📝 Adding items to Candy Machine...');
+    const addItemsResponse = await axios.post(`http://localhost:3000/api/candy-machine/add-items`, {
       collectionId: collectionId
-    };
-
-    console.log('   🚀 Sending add items request...');
-    
-    const addItemsResponse = await fetch(`${API_BASE_URL}/api/candy-machine/add-items`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(addItemsRequest)
     });
-
-    const addItemsResult = await addItemsResponse.json();
     
-    if (addItemsResult.success) {
-      console.log('   ✅ Items added successfully!');
-      console.log('   📝 Result:', addItemsResult.data);
-    } else {
-      console.log('   ❌ Adding items failed:', addItemsResult.error);
-    }
-
+    const result = addItemsResponse.data.data;
+    
+    console.log('✅ Items added successfully!');
+    console.log('📊 Add Items Results:');
+    console.log('- Collection ID:', collectionId);
+    console.log('- Items Added:', result.itemsAdded);
+    console.log('- Total Items:', result.totalItems);
+    
+    return result;
   } catch (error) {
-    console.error('❌ Test failed:', error.message);
+    console.error('❌ Error adding items:', error.response?.data || error.message);
+    throw error;
   }
 }
 
-// Run the test
-addItemsToCandyMachine();
+// Run the function
+addItemsToCandyMachine()
+  .then(result => {
+    console.log('\n🎉 Items added successfully!');
+    console.log('Items Added:', result.itemsAdded);
+    console.log('Total Items:', result.totalItems);
+    console.log('\nNext step: Test minting again');
+  })
+  .catch(error => {
+    console.error('❌ Failed to add items:', error.message);
+    process.exit(1);
+  });

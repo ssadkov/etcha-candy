@@ -135,6 +135,10 @@ export class CandyMachineService {
         collection: collection.collectionNftAddress
       });
 
+      console.log('🔍 Debug - collection.ticketPrice:', collection.ticketPrice);
+      console.log('🔍 Debug - candyMachineConfig.price:', candyMachineConfig.price);
+      console.log('🔍 Debug - typeof candyMachineConfig.price:', typeof candyMachineConfig.price);
+
       // Create Candy Machine using the correct API for our SDK version
       const candyMachine = await metaplex.candyMachines().create({
         itemsAvailable: candyMachineConfig.number,
@@ -145,7 +149,13 @@ export class CandyMachineService {
         // Set price through guards
         guards: {
           solPayment: {
-            amount: candyMachineConfig.price as any, // SOL amount - cast to any to bypass type checking
+            amount: {
+              basisPoints: BigInt(Math.floor(candyMachineConfig.price * 1e9)), // Convert SOL to lamports
+              currency: {
+                symbol: 'SOL',
+                decimals: 9,
+              },
+            },
             destination: this.solanaService.getKeypair().publicKey,
           },
         },
