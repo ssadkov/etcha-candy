@@ -1,10 +1,70 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CandyMachineService = void 0;
+const web3_js_1 = require("@solana/web3.js");
 class CandyMachineService {
     constructor(solanaService, collectionService) {
         this.solanaService = solanaService;
         this.collectionService = collectionService;
+    }
+    async createCollectionNFT(collection) {
+        try {
+            const metaplex = this.solanaService.getMetaplex();
+            const metadata = {
+                name: collection.name,
+                description: collection.description,
+                image: collection.imageUrl,
+                attributes: [
+                    { trait_type: 'Event', value: collection.eventName },
+                    { trait_type: 'Organizer', value: collection.eventCreatorName },
+                    { trait_type: 'Date', value: collection.eventDate },
+                    { trait_type: 'Location', value: collection.eventLocation },
+                    { trait_type: 'Type', value: 'Collection' },
+                    { trait_type: 'Max Tickets', value: collection.maxTickets.toString() },
+                    { trait_type: 'Ticket Price', value: `${collection.ticketPrice} SOL` }
+                ],
+                properties: {
+                    creators: [
+                        {
+                            address: this.solanaService.getWalletAddress(),
+                            verified: true,
+                            share: 50,
+                        },
+                        {
+                            address: collection.eventCreator,
+                            verified: false,
+                            share: 50,
+                        },
+                    ],
+                },
+            };
+            const { uri } = await metaplex.nfts().uploadMetadata(metadata);
+            console.log('Metadata uploaded to:', uri);
+            const collectionNft = await metaplex.nfts().create({
+                name: collection.name,
+                symbol: collection.name.substring(0, 4).toUpperCase(),
+                uri: uri,
+                sellerFeeBasisPoints: 250,
+                creators: [
+                    {
+                        address: this.solanaService.getKeypair().publicKey,
+                        share: 50,
+                    },
+                    {
+                        address: new web3_js_1.PublicKey(collection.eventCreator),
+                        share: 50,
+                    },
+                ],
+                isCollection: true,
+            });
+            console.log('Collection NFT created:', collectionNft.nft.address.toString());
+            console.log('Collection NFT metadata:', collectionNft.nft.uri);
+            return collectionNft.nft.address.toString();
+        }
+        catch (error) {
+            console.error('Error creating Collection NFT:', error);
+            throw new Error(`Failed to create Collection NFT: ${error.message}`);
+        }
     }
     async createCandyMachine(collection) {
         try {

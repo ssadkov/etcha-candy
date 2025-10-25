@@ -31,6 +31,7 @@ export interface Collection {
     ticketPrice: number;
     maxTickets: number;
     imageUrl: string;
+    collectionNftAddress?: string;
     candyMachineAddress?: string;
     status: 'active' | 'inactive' | 'completed';
     createdAt: string;

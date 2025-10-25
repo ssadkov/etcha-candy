@@ -32,7 +32,7 @@ class CollectionController {
                 });
                 return;
             }
-            const collection = await this.collectionService.createCollection(value);
+            const collection = await this.collectionService.createCollection(value, this.candyMachineService);
             res.status(201).json({
                 success: true,
                 data: collection,

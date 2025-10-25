@@ -39,7 +39,7 @@ class CollectionService {
             throw new Error('Failed to save collections');
         }
     }
-    async createCollection(data) {
+    async createCollection(data, candyMachineService) {
         const collections = this.readCollections();
         const collection = {
             id: this.generateId(),
@@ -49,6 +49,15 @@ class CollectionService {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };
+        try {
+            console.log('Creating Collection NFT for:', collection.name);
+            const collectionNftAddress = await candyMachineService.createCollectionNFT(collection);
+            collection.collectionNftAddress = collectionNftAddress;
+            console.log('Collection NFT created successfully:', collectionNftAddress);
+        }
+        catch (error) {
+            console.error('Failed to create Collection NFT:', error);
+        }
         collections.collections.push(collection);
         this.writeCollections(collections.collections);
         return collection;

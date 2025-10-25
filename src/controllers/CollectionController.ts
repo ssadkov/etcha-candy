@@ -38,7 +38,7 @@ export class CollectionController {
         return;
       }
 
-      const collection = await this.collectionService.createCollection(value as CreateCollectionRequest);
+      const collection = await this.collectionService.createCollection(value as CreateCollectionRequest, this.candyMachineService);
       
       res.status(201).json({
         success: true,

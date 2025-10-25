@@ -5,7 +5,7 @@ export declare class CollectionService {
     private ensureDataFile;
     private readCollections;
     private writeCollections;
-    createCollection(data: CreateCollectionRequest): Promise<Collection>;
+    createCollection(data: CreateCollectionRequest, candyMachineService: any): Promise<Collection>;
     getCollections(): Promise<Collection[]>;
     getCollectionById(id: string): Promise<Collection | null>;
     updateCollection(id: string, updates: Partial<Collection>): Promise<Collection | null>;

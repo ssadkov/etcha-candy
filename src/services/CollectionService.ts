@@ -40,7 +40,7 @@ export class CollectionService {
     }
   }
 
-  async createCollection(data: CreateCollectionRequest): Promise<Collection> {
+  async createCollection(data: CreateCollectionRequest, candyMachineService: any): Promise<Collection> {
     const collections = this.readCollections();
     
     const collection: Collection = {
@@ -51,6 +51,21 @@ export class CollectionService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
+
+    // Create Collection NFT on blockchain
+    try {
+      console.log('Creating Collection NFT for:', collection.name);
+      const collectionNftAddress = await candyMachineService.createCollectionNFT(collection);
+      
+      // Update collection with NFT address
+      collection.collectionNftAddress = collectionNftAddress;
+      
+      console.log('Collection NFT created successfully:', collectionNftAddress);
+    } catch (error) {
+      console.error('Failed to create Collection NFT:', error);
+      // Still save the collection even if NFT creation fails
+      // In production, you might want to handle this differently
+    }
 
     collections.collections.push(collection);
     this.writeCollections(collections.collections);

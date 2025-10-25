@@ -5,6 +5,7 @@ export declare class CandyMachineService {
     private solanaService;
     private collectionService;
     constructor(solanaService: SolanaService, collectionService: CollectionService);
+    createCollectionNFT(collection: Collection): Promise<string>;
     createCandyMachine(collection: Collection): Promise<string>;
     mintTicket(collectionId: string, userWallet: string, quantity?: number): Promise<string[]>;
     getCandyMachineInfo(candyMachineAddress: string): Promise<any>;

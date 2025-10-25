@@ -12,6 +12,61 @@ export class CandyMachineService {
     this.collectionService = collectionService;
   }
 
+  async createCollectionNFT(collection: Collection): Promise<string> {
+    try {
+      console.log('🎨 Starting Collection NFT creation...');
+      console.log('Collection data:', {
+        name: collection.name,
+        eventCreator: collection.eventCreator,
+        wallet: this.solanaService.getWalletAddress()
+      });
+
+      const metaplex = this.solanaService.getMetaplex();
+      
+      // Check wallet balance first
+      const balance = await this.solanaService.getBalance();
+      console.log('💰 Wallet balance:', balance, 'SOL');
+      
+      if (balance < 0.01) {
+        throw new Error('Insufficient SOL balance for transaction');
+      }
+      
+      console.log('🎨 Creating Collection NFT with URI metadata...');
+      
+      // Create metadata URI (our API endpoint)
+      const metadataUri = `https://api.etcha-candy.com/metadata/${collection.id}`;
+      
+      // Create Collection NFT with URI metadata (no upload to Bundlr)
+      const collectionNft = await metaplex.nfts().create({
+        name: collection.name,
+        symbol: collection.name.substring(0, 4).toUpperCase(),
+        uri: metadataUri, // Our API endpoint for metadata
+        sellerFeeBasisPoints: 250, // 2.5% royalty
+        creators: [
+          {
+            address: this.solanaService.getKeypair().publicKey,
+            share: 100, // 100% to platform
+          }
+        ],
+        isCollection: true,
+      });
+
+      console.log('🎉 Collection NFT created successfully!');
+      console.log('NFT Address:', collectionNft.nft.address.toString());
+      console.log('NFT Symbol:', collectionNft.nft.symbol);
+      console.log('Metadata URI:', metadataUri);
+      
+      return collectionNft.nft.address.toString();
+    } catch (error) {
+      console.error('❌ Error creating Collection NFT:', error);
+      console.error('Error details:', {
+        message: (error as Error).message,
+        stack: (error as Error).stack
+      });
+      throw new Error(`Failed to create Collection NFT: ${(error as Error).message}`);
+    }
+  }
+
   async createCandyMachine(collection: Collection): Promise<string> {
     try {
       // For now, return a mock Candy Machine address
