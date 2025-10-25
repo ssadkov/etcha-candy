@@ -1,0 +1,20 @@
+{
+  "collections": [
+    {
+      "id": "collection_1761413692799_47tf4ram6",
+      "eventCreatorName": "Test Event Organizer",
+      "description": "NFT tickets for Test Concert 2024",
+      "ticketPrice": 0.1,
+      "imageUrl": "https://example.com/concert.jpg",
+      "eventName": "Test Concert 2024",
+      "name": "Test Concert Collection",
+      "eventCreator": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+      "maxTickets": 100,
+      "eventDate": "2024-12-31",
+      "eventLocation": "Test Arena",
+      "status": "active",
+      "createdAt": "2025-10-25T17:34:52.799Z",
+      "updatedAt": "2025-10-25T17:34:52.799Z"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "platform": {
+    "name": "Etcha Candy Platform",
+    "walletAddress": "",
+    "royalty": 2.5,
+    "description": "NFT ticket platform for events"
+  },
+  "solana": {
+    "network": "devnet",
+    "rpcUrl": "https://api.devnet.solana.com",
+    "commitment": "confirmed"
+  },
+  "server": {
+    "port": 3000,
+    "corsOrigin": "*",
+    "rateLimit": {
+      "windowMs": 900000,
+      "max": 100
+    }
+  }
+}
