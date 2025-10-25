@@ -74,12 +74,10 @@ export class TicketController {
 
       // Check if user has enough SOL
       const userBalance = await this.solanaService.getConnection().getBalance(
-        this.solanaService.getConnection().getPublicKey ? 
-        this.solanaService.getConnection().getPublicKey() : 
         new (await import('@solana/web3.js')).PublicKey(userWallet)
       );
       const userBalanceSOL = userBalance / 1e9;
-      const requiredSOL = collection.ticketPrice * quantity;
+      const requiredSOL = collection.ticketPrice * (quantity || 1);
 
       if (userBalanceSOL < requiredSOL) {
         res.status(400).json({
@@ -226,6 +224,60 @@ export class TicketController {
       res.status(500).json({
         success: false,
         error: `Failed to get test wallets: ${(error as Error).message}`,
+      } as ApiResponse);
+    }
+  }
+
+  // New endpoint to add items to Candy Machine
+  async addItemsToCandyMachine(req: Request, res: Response): Promise<void> {
+    try {
+      const { collectionId } = req.body;
+
+      if (!collectionId) {
+        res.status(400).json({
+          success: false,
+          error: 'Collection ID is required',
+        } as ApiResponse);
+        return;
+      }
+
+      console.log('🎫 Adding items to Candy Machine for collection:', collectionId);
+
+      // Get collection
+      const collection = await this.collectionService.getCollectionById(collectionId);
+      if (!collection) {
+        res.status(404).json({
+          success: false,
+          error: 'Collection not found',
+        } as ApiResponse);
+        return;
+      }
+
+      if (!collection.candyMachineAddress) {
+        res.status(400).json({
+          success: false,
+          error: 'Candy Machine not found for this collection',
+        } as ApiResponse);
+        return;
+      }
+
+      // Add items to Candy Machine
+      await this.candyMachineService.addItemsToCandyMachine(collection.candyMachineAddress, collection);
+
+      res.json({
+        success: true,
+        data: {
+          message: 'Items added to Candy Machine successfully',
+          collectionId,
+          candyMachineAddress: collection.candyMachineAddress,
+          itemsCount: collection.maxTickets,
+        },
+      } as ApiResponse);
+    } catch (error) {
+      console.error('Error adding items to Candy Machine:', error);
+      res.status(500).json({
+        success: false,
+        error: `Failed to add items to Candy Machine: ${(error as Error).message}`,
       } as ApiResponse);
     }
   }

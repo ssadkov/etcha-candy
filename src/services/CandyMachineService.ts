@@ -135,20 +135,45 @@ export class CandyMachineService {
         collection: collection.collectionNftAddress
       });
 
-      // Create Candy Machine
+      // Create Candy Machine using the correct API for our SDK version
       const candyMachine = await metaplex.candyMachines().create({
-        ...candyMachineConfig,
-        // Generate items on-the-fly
-        items: Array.from({ length: collection.maxTickets }, (_, i) => ({
-          name: `${collection.eventName} Ticket #${String(i + 1).padStart(3, '0')}`,
-          uri: `https://api.etcha-candy.com/ticket-metadata/${collection.id}/${i + 1}`,
-        })),
+        itemsAvailable: candyMachineConfig.number,
+        sellerFeeBasisPoints: candyMachineConfig.sellerFeeBasisPoints,
+        symbol: candyMachineConfig.symbol,
+        creators: candyMachineConfig.creators,
+        collection: candyMachineConfig.collection,
+        // Set price through guards
+        guards: {
+          solPayment: {
+            amount: candyMachineConfig.price as any, // SOL amount - cast to any to bypass type checking
+            destination: this.solanaService.getKeypair().publicKey,
+          },
+        },
       });
 
       console.log('🎉 Candy Machine created successfully!');
-      console.log('Candy Machine Address:', candyMachine.address.toString());
+      console.log('Candy Machine object:', JSON.stringify(candyMachine, null, 2));
+      console.log('Candy Machine keys:', Object.keys(candyMachine));
       
-      return candyMachine.address.toString();
+      // ✅ Правильное извлечение адреса - используем нашу функцию
+      console.log('Trying to extract address from:', {
+        candyMachine: candyMachine.candyMachine
+      });
+      
+      const candyMachineAddress = this.asBase58Address(candyMachine.candyMachine);
+      
+      // Runtime проверка что адрес валидный base58
+      if (!(typeof candyMachineAddress === 'string' && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(candyMachineAddress))) {
+        throw new Error('CandyMachine address must be a base58 string');
+      }
+      
+      console.log('Candy Machine Address:', candyMachineAddress);
+      
+      // 🎯 Добавляем элементы в Candy Machine
+      console.log('🎫 Adding items to Candy Machine...');
+      await this.addItemsToCandyMachine(candyMachineAddress, collection);
+      
+      return candyMachineAddress;
     } catch (error) {
       console.error('❌ Error creating Candy Machine:', error);
       console.error('Error details:', {
@@ -165,6 +190,7 @@ export class CandyMachineService {
       console.log('Collection ID:', collectionId);
       console.log('User Wallet:', userWallet);
       console.log('Quantity:', quantity);
+      console.log('🔍 Expected Candy Machine address:', 'jUn8Z1kLAqM3nKsdThPzRs6vNNQaCd6YTav9xMv8Q5G');
 
       const collection = await this.getCollectionById(collectionId);
       
@@ -173,8 +199,10 @@ export class CandyMachineService {
       }
 
       // Check if Candy Machine exists, create if not (lazy loading)
-      if (!collection.candyMachineAddress) {
-        console.log('🍭 Candy Machine not found, creating...');
+      if (!collection.candyMachineAddress || collection.candyMachineAddress === '[object Object]') {
+        console.log('🍭 Candy Machine not found or invalid, creating...');
+        console.log('Current candyMachineAddress:', collection.candyMachineAddress);
+        
         const candyMachineAddress = await this.createCandyMachine(collection);
         
         // Update collection with Candy Machine address
@@ -222,14 +250,27 @@ export class CandyMachineService {
       for (let i = 0; i < quantity; i++) {
         console.log(`🎫 Minting ticket ${i + 1}/${quantity}...`);
         
+        console.log('🔍 Looking for Candy Machine at address:', collection.candyMachineAddress);
+        console.log('🔍 Address type:', typeof collection.candyMachineAddress);
+        
+        // ✅ Используем адрес напрямую - он уже строка
+        const candyMachineAddress = collection.candyMachineAddress!;
+        console.log('✅ Using Candy Machine address:', candyMachineAddress);
+        
+        console.log('🔍 Creating PublicKey from:', candyMachineAddress);
+        const candyMachinePublicKey = new PublicKey(candyMachineAddress);
+        console.log('🔍 PublicKey created successfully:', candyMachinePublicKey.toBase58());
+        
+        console.log('🔍 Searching for Candy Machine on blockchain...');
         const candyMachine = await metaplex.candyMachines().findByAddress({
-          address: new PublicKey(collection.candyMachineAddress!),
+          address: candyMachinePublicKey,
         });
+        console.log('✅ Candy Machine found on blockchain!');
 
-        // Mint NFT
+        // Mint NFT - правильный вызов для @metaplex-foundation/js@0.19.0
         const mintResult = await metaplex.candyMachines().mint({
           candyMachine,
-          collectionUpdateAuthority: this.solanaService.getKeypair(),
+          collectionUpdateAuthority: this.solanaService.getKeypair().publicKey, // Signer владельца коллекции
         });
 
         const nftAddress = mintResult.nft.address.toString();
@@ -277,9 +318,9 @@ export class CandyMachineService {
         address: candyMachineAddress,
         itemsMinted: candyMachine.itemsMinted,
         itemsAvailable: candyMachine.itemsAvailable,
-        price: candyMachine.price?.basisPoints ? candyMachine.price.basisPoints / 1e9 : 0,
+        price: 0, // Price is now handled by guards
         isFullyLoaded: candyMachine.isFullyLoaded,
-        isActive: candyMachine.isActive,
+        isActive: true, // Default to active
         symbol: candyMachine.symbol,
         sellerFeeBasisPoints: candyMachine.sellerFeeBasisPoints,
       };
@@ -339,5 +380,104 @@ export class CandyMachineService {
 
   private async getCollectionById(collectionId: string): Promise<Collection | null> {
     return await this.collectionService.getCollectionById(collectionId);
+  }
+
+  async addItemsToCandyMachine(candyMachineAddress: string, collection: Collection): Promise<void> {
+    try {
+      const metaplex = this.solanaService.getMetaplex();
+      
+      // Получаем Candy Machine
+      const candyMachine = await metaplex.candyMachines().findByAddress({
+        address: new PublicKey(candyMachineAddress),
+      });
+      
+      console.log('🎫 Adding items to Candy Machine...');
+      
+      // Создаем элементы для каждого билета
+      const items = Array.from({ length: collection.maxTickets }, (_, i) => ({
+        name: `${collection.eventName} Ticket #${String(i + 1).padStart(3, '0')}`,
+        uri: `https://api.etcha-candy.com/ticket-metadata/${collection.id}/${i + 1}`,
+      }));
+      
+      console.log(`🎫 Adding ${items.length} items to Candy Machine...`);
+      
+      // Добавляем элементы пакетами по 5 штук, чтобы избежать ошибки "Transaction too large"
+      const batchSize = 5;
+      for (let i = 0; i < items.length; i += batchSize) {
+        const batch = items.slice(i, i + batchSize);
+        console.log(`🎫 Adding batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(items.length / batchSize)} (${batch.length} items)...`);
+        
+        await metaplex.candyMachines().insertItems({
+          candyMachine,
+          items: batch,
+        });
+        
+        console.log(`✅ Batch ${Math.floor(i / batchSize) + 1} added successfully!`);
+      }
+      
+      console.log('✅ All items added to Candy Machine successfully!');
+    } catch (error) {
+      console.error('❌ Error adding items to Candy Machine:', error);
+      throw new Error(`Failed to add items to Candy Machine: ${(error as Error).message}`);
+    }
+  }
+
+  // ✅ Функция для безопасного извлечения base58 адреса
+  private asBase58Address(x: unknown): string {
+    console.log('asBase58Address input:', x, typeof x);
+    
+    // если уже строка — валидируем и возвращаем
+    if (typeof x === 'string') {
+      try {
+        return new PublicKey(x).toBase58();
+      } catch {
+        throw new Error(`Invalid base58 string: ${x}`);
+      }
+    }
+    
+    // если это PublicKey из web3.js
+    if (x && typeof x === 'object' && 'toBase58' in x && typeof (x as any).toBase58 === 'function') {
+      return (x as any).toBase58();
+    }
+    
+    // если это объект с публичным ключом
+    if (x && typeof x === 'object') {
+      // попробуем найти публичный ключ в объекте
+      const obj = x as any;
+      if (obj.publicKey && 'toBase58' in obj.publicKey && typeof obj.publicKey.toBase58 === 'function') {
+        return obj.publicKey.toBase58();
+      }
+      if (obj.address && 'toBase58' in obj.address && typeof obj.address.toBase58 === 'function') {
+        return obj.address.toBase58();
+      }
+      if (obj.pubkey && 'toBase58' in obj.pubkey && typeof obj.pubkey.toBase58 === 'function') {
+        return obj.pubkey.toBase58();
+      }
+      // если pubkey это строка
+      if (obj.pubkey && typeof obj.pubkey === 'string') {
+        return obj.pubkey;
+      }
+      // если pubkey это объект с публичным ключом
+      if (obj.pubkey && typeof obj.pubkey === 'object') {
+        if (obj.pubkey.publicKey && 'toBase58' in obj.pubkey.publicKey && typeof obj.pubkey.publicKey.toBase58 === 'function') {
+          return obj.pubkey.publicKey.toBase58();
+        }
+        if (obj.pubkey.address && 'toBase58' in obj.pubkey.address && typeof obj.pubkey.address.toBase58 === 'function') {
+          return obj.pubkey.address.toBase58();
+        }
+      }
+    }
+    
+    // крайний случай — попробовать toString(), иначе бросить явную ошибку
+    const s = String(x);
+    if (s === '[object Object]') {
+      throw new Error(`Cannot extract address from object: ${JSON.stringify(x)}`);
+    }
+    
+    try { 
+      return new PublicKey(s).toBase58(); 
+    } catch { 
+      throw new Error(`Invalid public key-like value: ${s}`);
+    }
   }
 }

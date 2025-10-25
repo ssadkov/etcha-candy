@@ -18,6 +18,7 @@ export function createRoutes(
   // Candy Machine routes
   router.post('/collections/:id/candy-machine', (req, res) => collectionController.createCandyMachine(req, res));
   router.get('/collections/:id/candy-machine', (req, res) => collectionController.getCandyMachineInfo(req, res));
+  router.post('/candy-machine/add-items', (req, res) => ticketController.addItemsToCandyMachine(req, res));
 
   // Ticket routes
   router.post('/tickets/mint', (req, res) => ticketController.mintTicket(req, res));

@@ -222,8 +222,16 @@
       "eventLocation": "FIXED Arena",
       "status": "active",
       "createdAt": "2025-10-25T18:00:40.951Z",
-      "updatedAt": "2025-10-25T18:00:40.951Z",
-      "collectionNftAddress": "EVhit261jZVzzsv1Pw7f8f4rWTjk1LwDHbjzBJix6i9m"
+      "updatedAt": "2025-10-25T19:08:53.590Z",
+      "collectionNftAddress": "EVhit261jZVzzsv1Pw7f8f4rWTjk1LwDHbjzBJix6i9m",
+      "candyMachineAddress": "jUn8Z1kLAqM3nKsdThPzRs6vNNQaCd6YTav9xMv8Q5G",
+      "candyMachineConfig": {
+        "price": 0.1,
+        "supply": 100,
+        "minted": 0,
+        "isActive": true,
+        "createdAt": "2025-10-25T19:08:53.590Z"
+      }
     },
     {
       "id": "collection_1761415258654_d9sdxbawx",
@@ -258,6 +266,95 @@
       "createdAt": "2025-10-25T18:12:11.477Z",
       "updatedAt": "2025-10-25T18:12:11.477Z",
       "collectionNftAddress": "2EwQ5s4LG9zewK3DbWaSqEidZryex2S6Eea1dHEthtVa"
+    },
+    {
+      "id": "collection_1761421291954_59qllrndg",
+      "eventCreatorName": "Test Minting Organizer",
+      "description": "Testing complete minting flow",
+      "ticketPrice": 0.1,
+      "imageUrl": "https://example.com/minting-test.jpg",
+      "eventName": "Minting Test Event",
+      "name": "Minting Test Collection",
+      "eventCreator": "4ezFV6pcyYYT6HaFoK9vXoLrzZZ3bz5roD7eSkFLyqNV",
+      "maxTickets": 10,
+      "eventDate": "2024-12-31",
+      "eventLocation": "Test Arena",
+      "status": "active",
+      "createdAt": "2025-10-25T19:41:31.954Z",
+      "updatedAt": "2025-10-25T19:41:31.954Z",
+      "collectionNftAddress": "8kPY4TduHiMqUe3fPJTYcoT1NcU1AFeYeEKgEeXugNAy"
+    },
+    {
+      "id": "collection_1761421308456_5dfem85yw",
+      "eventCreatorName": "Test Minting Organizer",
+      "description": "Testing complete minting flow",
+      "ticketPrice": 0.1,
+      "imageUrl": "https://example.com/minting-test.jpg",
+      "eventName": "Minting Test Event",
+      "name": "Minting Test Collection",
+      "eventCreator": "4ezFV6pcyYYT6HaFoK9vXoLrzZZ3bz5roD7eSkFLyqNV",
+      "maxTickets": 10,
+      "eventDate": "2024-12-31",
+      "eventLocation": "Test Arena",
+      "status": "active",
+      "createdAt": "2025-10-25T19:41:48.457Z",
+      "updatedAt": "2025-10-25T19:41:48.457Z",
+      "collectionNftAddress": "3U2DfwaaQAXsNNLYWrzc4jvrZFfBLoGgKjviD4Pp3FG4"
+    },
+    {
+      "id": "collection_1761421330531_ruet7gryp",
+      "eventCreatorName": "Test Minting Organizer",
+      "description": "Testing complete minting flow",
+      "ticketPrice": 0.1,
+      "imageUrl": "https://example.com/minting-test.jpg",
+      "eventName": "Minting Test Event",
+      "name": "Minting Test Collection",
+      "eventCreator": "4ezFV6pcyYYT6HaFoK9vXoLrzZZ3bz5roD7eSkFLyqNV",
+      "maxTickets": 10,
+      "eventDate": "2024-12-31",
+      "eventLocation": "Test Arena",
+      "status": "active",
+      "createdAt": "2025-10-25T19:42:10.531Z",
+      "updatedAt": "2025-10-25T19:42:10.531Z",
+      "collectionNftAddress": "JBksogXFwc3wNzNF4MAixRexUWHDeYpZEPRbuJVhnCfC"
+    },
+    {
+      "id": "collection_1761421359678_yw4wjr8xs",
+      "eventCreatorName": "Test Minting Organizer",
+      "description": "Testing complete minting flow",
+      "ticketPrice": 0.1,
+      "imageUrl": "https://example.com/minting-test.jpg",
+      "eventName": "Minting Test Event",
+      "name": "Minting Test Collection",
+      "eventCreator": "4ezFV6pcyYYT6HaFoK9vXoLrzZZ3bz5roD7eSkFLyqNV",
+      "maxTickets": 10,
+      "eventDate": "2024-12-31",
+      "eventLocation": "Test Arena",
+      "status": "active",
+      "createdAt": "2025-10-25T19:42:39.678Z",
+      "updatedAt": "2025-10-25T19:42:39.678Z",
+      "collectionNftAddress": "gFexg6WaKvxu6eUZMUJFEbXjzzosYJCSuxpDDDj1KBm"
+    },
+    {
+      "id": "collection_1761421533360_4xrteague",
+      "eventCreatorName": "Minting Test Organizer",
+      "description": "Testing complete minting flow with small collection",
+      "ticketPrice": 0.1,
+      "imageUrl": "https://example.com/minting-test.jpg",
+      "eventName": "Minting Test Event",
+      "name": "Minting Test Collection",
+      "eventCreator": "4ezFV6pcyYYT6HaFoK9vXoLrzZZ3bz5roD7eSkFLyqNV",
+      "maxTickets": 5,
+      "eventDate": "2024-12-31",
+      "eventLocation": "Test Arena",
+      "status": "active",
+      "createdAt": "2025-10-25T19:45:33.360Z",
+      "updatedAt": "2025-10-25T19:45:44.003Z",
+      "collectionNftAddress": "CR6wcxexGpd8WEXMSQg1Bgjt5mYV9FLtJLRjQ2Zw4Udz",
+      "candyMachineAddress": "8rVpkqC55YWTL83r9rLCfVyL1LRoeQ5MgGNnz7jNwFed",
+      "candyMachineConfig": {
+        "minted": 1
+      }
     }
   ]
 }

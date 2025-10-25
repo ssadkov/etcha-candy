@@ -12,5 +12,7 @@ export declare class TicketController {
     mintTicket(req: Request, res: Response): Promise<void>;
     getUserTickets(req: Request, res: Response): Promise<void>;
     validateTicket(req: Request, res: Response): Promise<void>;
+    getTestWallets(req: Request, res: Response): Promise<void>;
+    addItemsToCandyMachine(req: Request, res: Response): Promise<void>;
 }
 //# sourceMappingURL=TicketController.d.ts.map

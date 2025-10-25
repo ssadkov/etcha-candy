@@ -33,9 +33,17 @@ export interface Collection {
     imageUrl: string;
     collectionNftAddress?: string;
     candyMachineAddress?: string;
+    candyMachineConfig?: CandyMachineConfig;
     status: 'active' | 'inactive' | 'completed';
     createdAt: string;
     updatedAt: string;
+}
+export interface CandyMachineConfig {
+    price: number;
+    supply: number;
+    minted: number;
+    isActive: boolean;
+    createdAt?: string;
 }
 export interface CreateCollectionRequest {
     eventCreator: string;
@@ -53,6 +61,30 @@ export interface MintTicketRequest {
     collectionId: string;
     userWallet: string;
     quantity?: number;
+}
+export interface MintTicketResponse {
+    success: boolean;
+    ticketNftAddresses: string[];
+    transactionSignature: string;
+    ticketNumbers: string[];
+    error?: string;
+}
+export interface TestWallet {
+    name: string;
+    wallet: string;
+    privateKey: number[];
+}
+export interface MintingRecord {
+    id: string;
+    collectionId: string;
+    userWallet: string;
+    ticketNftAddresses: string[];
+    ticketNumbers: string[];
+    transactionSignature: string;
+    amountPaid: number;
+    quantity: number;
+    mintedAt: string;
+    status: 'success' | 'failed';
 }
 export interface TicketMetadata {
     name: string;
