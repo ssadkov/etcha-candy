@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { CandyMachineService } from '../services/CandyMachineService';
 import { CollectionService } from '../services/CollectionService';
 import { SolanaService } from '../services/SolanaService';
-import { MintTicketRequest, ValidateTicketRequest, ApiResponse } from '../types';
+import { MintTicketRequest, ValidateTicketRequest, ApiResponse, MintTicketResponse } from '../types';
 import Joi from 'joi';
 
 export class TicketController {
@@ -54,7 +54,7 @@ export class TicketController {
         return;
       }
 
-      // Check if collection exists and has Candy Machine
+      // Check if collection exists
       const collection = await this.collectionService.getCollectionById(collectionId);
       if (!collection) {
         res.status(404).json({
@@ -64,32 +64,51 @@ export class TicketController {
         return;
       }
 
-      if (!collection.candyMachineAddress) {
+      if (!collection.collectionNftAddress) {
         res.status(400).json({
           success: false,
-          error: 'Candy Machine not created for this collection',
+          error: 'Collection NFT not created',
         } as ApiResponse);
         return;
       }
 
-      // Mint tickets
-      const mintedNfts = await this.candyMachineService.mintTicket(collectionId, userWallet, quantity);
+      // Check if user has enough SOL
+      const userBalance = await this.solanaService.getConnection().getBalance(
+        this.solanaService.getConnection().getPublicKey ? 
+        this.solanaService.getConnection().getPublicKey() : 
+        new (await import('@solana/web3.js')).PublicKey(userWallet)
+      );
+      const userBalanceSOL = userBalance / 1e9;
+      const requiredSOL = collection.ticketPrice * quantity;
+
+      if (userBalanceSOL < requiredSOL) {
+        res.status(400).json({
+          success: false,
+          error: `Insufficient SOL balance. Required: ${requiredSOL} SOL, Available: ${userBalanceSOL} SOL`,
+        } as ApiResponse);
+        return;
+      }
+
+      // Mint tickets (Candy Machine will be created if needed)
+      const mintResult = await this.candyMachineService.mintTicket(collectionId, userWallet, quantity);
+      
+      const response: MintTicketResponse = {
+        success: true,
+        ticketNftAddresses: mintResult.nftAddresses,
+        transactionSignature: 'mock_transaction_signature', // Will be real in production
+        ticketNumbers: mintResult.ticketNumbers,
+      };
       
       res.json({
         success: true,
-        data: {
-          mintedNfts,
-          collectionId,
-          userWallet,
-          quantity,
-        },
+        data: response,
         message: `${quantity} ticket(s) minted successfully`,
       } as ApiResponse);
     } catch (error) {
       console.error('Error minting ticket:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to mint ticket',
+        error: `Failed to mint ticket: ${(error as Error).message}`,
       } as ApiResponse);
     }
   }
@@ -108,35 +127,23 @@ export class TicketController {
         return;
       }
 
-      // Get all collections
-      const collections = await this.collectionService.getCollections();
-      
-      // For now, return collections where user could have tickets
-      // In a real implementation, you would query the blockchain for actual NFT ownership
-      const userTickets = collections.map(collection => ({
-        collectionId: collection.id,
-        collectionName: collection.name,
-        eventName: collection.eventName,
-        eventDate: collection.eventDate,
-        eventLocation: collection.eventLocation,
-        imageUrl: collection.imageUrl,
-        candyMachineAddress: collection.candyMachineAddress,
-        // Note: Actual ticket ownership would be determined by querying the blockchain
-        ownedTickets: [], // This would be populated by blockchain queries
-      }));
+      // Get user's NFTs from blockchain
+      const userTickets = await this.candyMachineService.getUserTickets(wallet);
 
       res.json({
         success: true,
         data: {
           wallet,
           tickets: userTickets,
+          count: userTickets.length,
         },
+        message: `Found ${userTickets.length} ticket(s)`,
       } as ApiResponse);
     } catch (error) {
       console.error('Error getting user tickets:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to get user tickets',
+        error: `Failed to get user tickets: ${(error as Error).message}`,
       } as ApiResponse);
     }
   }
@@ -174,15 +181,8 @@ export class TicketController {
         return;
       }
 
-      // In a real implementation, you would:
-      // 1. Query the blockchain to verify the NFT exists
-      // 2. Check if it belongs to the correct collection
-      // 3. Verify the current owner
-      // 4. Check if the ticket hasn't been used before
-
-      // For now, return a mock validation
-      const isValid = true; // This would be determined by blockchain queries
-      const owner = 'mock_owner_address'; // This would be the actual owner from blockchain
+      // Validate ticket on blockchain
+      const isValid = await this.candyMachineService.validateTicket(mintAddress, collectionId);
 
       res.json({
         success: true,
@@ -190,7 +190,6 @@ export class TicketController {
           mintAddress,
           collectionId,
           isValid,
-          owner,
           collection: {
             name: collection.name,
             eventName: collection.eventName,
@@ -204,7 +203,29 @@ export class TicketController {
       console.error('Error validating ticket:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to validate ticket',
+        error: `Failed to validate ticket: ${(error as Error).message}`,
+      } as ApiResponse);
+    }
+  }
+
+  // New endpoint to get test wallets
+  async getTestWallets(req: Request, res: Response): Promise<void> {
+    try {
+      const testWallets = await this.candyMachineService.getTestWallets();
+      
+      res.json({
+        success: true,
+        data: {
+          wallets: testWallets,
+          count: testWallets.length,
+        },
+        message: `Found ${testWallets.length} test wallet(s)`,
+      } as ApiResponse);
+    } catch (error) {
+      console.error('Error getting test wallets:', error);
+      res.status(500).json({
+        success: false,
+        error: `Failed to get test wallets: ${(error as Error).message}`,
       } as ApiResponse);
     }
   }
