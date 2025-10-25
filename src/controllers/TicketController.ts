@@ -114,6 +114,7 @@ export class TicketController {
   async getUserTickets(req: Request, res: Response): Promise<void> {
     try {
       const { wallet } = req.params;
+      const { collectionId } = req.query;
       
       // Validate wallet address
       const isValidWallet = await this.solanaService.isWalletValid(wallet);
@@ -125,8 +126,8 @@ export class TicketController {
         return;
       }
 
-      // Get user's NFTs from blockchain
-      const userTickets = await this.candyMachineService.getUserTickets(wallet);
+      // Get user's NFTs from blockchain (filtered by our platform)
+      const userTickets = await this.candyMachineService.getUserTickets(wallet, collectionId as string);
 
       res.json({
         success: true,
@@ -134,14 +135,53 @@ export class TicketController {
           wallet,
           tickets: userTickets,
           count: userTickets.length,
+          platformWallet: this.solanaService.getWalletAddress(),
+          filteredByPlatform: true,
         },
-        message: `Found ${userTickets.length} ticket(s)`,
+        message: `Found ${userTickets.length} ticket(s) from our platform`,
       } as ApiResponse);
     } catch (error) {
       console.error('Error getting user tickets:', error);
       res.status(500).json({
         success: false,
         error: `Failed to get user tickets: ${(error as Error).message}`,
+      } as ApiResponse);
+    }
+  }
+
+  async getUserTicketsFromPlatform(req: Request, res: Response): Promise<void> {
+    try {
+      const { wallet } = req.params;
+      
+      // Validate wallet address
+      const isValidWallet = await this.solanaService.isWalletValid(wallet);
+      if (!isValidWallet) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid wallet address',
+        } as ApiResponse);
+        return;
+      }
+
+      // Get user's NFTs from our platform only
+      const userTickets = await this.candyMachineService.getUserTicketsFromPlatform(wallet);
+
+      res.json({
+        success: true,
+        data: {
+          wallet,
+          tickets: userTickets,
+          count: userTickets.length,
+          platformWallet: this.solanaService.getWalletAddress(),
+          filteredByPlatform: true,
+        },
+        message: `Found ${userTickets.length} ticket(s) from our platform`,
+      } as ApiResponse);
+    } catch (error) {
+      console.error('Error getting user tickets from platform:', error);
+      res.status(500).json({
+        success: false,
+        error: `Failed to get user tickets from platform: ${(error as Error).message}`,
       } as ApiResponse);
     }
   }

@@ -271,7 +271,7 @@ class CandyMachineService {
     async getTestWallets() {
         return this.testWallets;
     }
-    async getUserTickets(userWallet) {
+    async getUserTickets(userWallet, collectionId) {
         try {
             const testWallet = this.getTestWallet(userWallet);
             if (!testWallet) {
@@ -282,11 +282,44 @@ class CandyMachineService {
             const nfts = await metaplex.nfts().findAllByOwner({
                 owner: userKeypair.publicKey,
             });
-            return nfts.map(nft => nft.address.toString());
+            if (collectionId) {
+                const collection = await this.getCollectionById(collectionId);
+                if (collection?.collectionNftAddress) {
+                    const collectionAddress = new web3_js_1.PublicKey(collection.collectionNftAddress);
+                    return nfts
+                        .filter(nft => nft.collection?.address.equals(collectionAddress))
+                        .map(nft => nft.address.toString());
+                }
+            }
+            const platformWallet = this.solanaService.getKeypair().publicKey;
+            return nfts
+                .filter(nft => nft.creators?.some(creator => creator.address.equals(platformWallet)))
+                .map(nft => nft.address.toString());
         }
         catch (error) {
             console.error('Error getting user tickets:', error);
             throw new Error(`Failed to get user tickets: ${error.message}`);
+        }
+    }
+    async getUserTicketsFromPlatform(userWallet) {
+        try {
+            const testWallet = this.getTestWallet(userWallet);
+            if (!testWallet) {
+                throw new Error('Test wallet not found');
+            }
+            const userKeypair = this.createKeypairFromPrivateKey(testWallet.privateKey);
+            const metaplex = this.solanaService.getMetaplex();
+            const nfts = await metaplex.nfts().findAllByOwner({
+                owner: userKeypair.publicKey,
+            });
+            const platformWallet = this.solanaService.getKeypair().publicKey;
+            return nfts
+                .filter(nft => nft.creators?.some(creator => creator.address.equals(platformWallet)))
+                .map(nft => nft.address.toString());
+        }
+        catch (error) {
+            console.error('Error getting user tickets from platform:', error);
+            throw new Error(`Failed to get user tickets from platform: ${error.message}`);
         }
     }
     async validateTicket(nftAddress, collectionId) {

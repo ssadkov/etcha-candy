@@ -17,7 +17,8 @@ export declare class CandyMachineService {
     }>;
     getCandyMachineInfo(candyMachineAddress: string): Promise<any>;
     getTestWallets(): Promise<TestWallet[]>;
-    getUserTickets(userWallet: string): Promise<string[]>;
+    getUserTickets(userWallet: string, collectionId?: string): Promise<string[]>;
+    getUserTicketsFromPlatform(userWallet: string): Promise<string[]>;
     validateTicket(nftAddress: string, collectionId: string): Promise<boolean>;
     private getCollectionById;
     addItemsToCandyMachine(candyMachineAddress: string, collection: Collection): Promise<void>;

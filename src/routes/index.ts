@@ -23,6 +23,7 @@ export function createRoutes(
   // Ticket routes
   router.post('/tickets/mint', (req, res) => ticketController.mintTicket(req, res));
   router.get('/tickets/user/:wallet', (req, res) => ticketController.getUserTickets(req, res));
+  router.get('/tickets/platform/:wallet', (req, res) => ticketController.getUserTicketsFromPlatform(req, res));
   router.post('/tickets/validate', (req, res) => ticketController.validateTicket(req, res));
   
   // Test wallet routes

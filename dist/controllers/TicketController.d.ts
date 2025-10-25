@@ -11,6 +11,7 @@ export declare class TicketController {
     private validateValidateTicket;
     mintTicket(req: Request, res: Response): Promise<void>;
     getUserTickets(req: Request, res: Response): Promise<void>;
+    getUserTicketsFromPlatform(req: Request, res: Response): Promise<void>;
     validateTicket(req: Request, res: Response): Promise<void>;
     getTestWallets(req: Request, res: Response): Promise<void>;
     addItemsToCandyMachine(req: Request, res: Response): Promise<void>;
