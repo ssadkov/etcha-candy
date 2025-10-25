@@ -2,12 +2,15 @@
 
 NFT ticket platform backend using Metaplex Candy Machine on Solana blockchain.
 
-## 🎯 Current Status: Collection NFT Creation ✅
+## 🎯 Current Status: Full NFT Minting Pipeline ✅
 
-**Collection NFTs are successfully created on Solana devnet!**
+**Complete NFT minting pipeline is working on Solana devnet!**
 
 ### ✅ What Works Now:
 - **Collection NFT Creation** - Real NFTs created on blockchain
+- **Candy Machine Creation** - Automated Candy Machine setup with items
+- **NFT Minting** - Users can mint tickets using their own wallets
+- **Multi-User Support** - Bob and Charlie successfully minted NFTs
 - **Metadata URI Storage** - Metadata links stored on-chain (no IPFS/Arweave)
 - **Platform Wallet Integration** - Uses platform wallet as creator
 - **JSON Database** - Collections stored locally for development
@@ -17,8 +20,72 @@ NFT ticket platform backend using Metaplex Candy Machine on Solana blockchain.
 ### 🔗 Blockchain Integration:
 - **Network**: Solana Devnet
 - **Collection NFTs**: Created with real blockchain transactions
+- **Candy Machines**: Automated creation with proper item configuration
+- **NFT Minting**: Real blockchain transactions with user wallets
 - **Creator**: Platform wallet (100% royalty share)
 - **Metadata**: Stored via URI links to API endpoints
+
+## 🧪 Testing Results
+
+### ✅ Bob & Charlie Minting Test - SUCCESSFUL
+
+**Test Date:** October 25, 2025  
+**Collection:** "Short Test Collection" (`collection_1761424771087_lqluhspsk`)
+
+#### Test Results:
+- **Bob Wallet:** `GcUxE5YPjFtK4ri1CZ2vG9tK9Mrt6hFSZ38cLCoC5tf7`
+  - ✅ **NFT Minted:** `G2jAUxWjpn1xho8YFPBtEvjiSTQj321cCqdumcF2USzs`
+  - ✅ **Ticket Number:** `002`
+  - ✅ **Status:** SUCCESS
+
+- **Charlie Wallet:** `4LJ9wbTJW3y9LJ4ZzcR3BFXJoWLJkZR4NdYzPFm72nLy`
+  - ✅ **NFT Minted:** `CWpdejjwcb6N3UKwY7TXWhnRkLGkwgiAVAjNtLdZS875`
+  - ✅ **Ticket Number:** `003`
+  - ✅ **Status:** SUCCESS
+
+#### Key Achievements:
+1. **Multi-User Minting** - Different users can mint from the same Candy Machine
+2. **Correct Wallet Usage** - Each user's wallet is properly used for minting
+3. **Sequential Ticket Numbers** - Tickets are numbered correctly (002, 003)
+4. **Real Blockchain Transactions** - All NFTs are real on Solana devnet
+5. **Proper Payment Handling** - Each user pays from their own wallet
+
+#### Technical Details:
+- **Candy Machine Address:** Created automatically with collection
+- **Items Available:** 5 tickets total
+- **Price per Ticket:** 0.1 SOL
+- **Minting Method:** Metaplex Candy Machine V3
+- **User Authentication:** Private key-based wallet authentication
+
+### 🔧 Testing Process
+
+#### Step 1: Collection Creation
+```bash
+# Create collection with short event name (to avoid 32-char limit)
+node create-short-event-collection.js
+```
+
+#### Step 2: Minting Test
+```bash
+# Test Bob and Charlie minting
+node test-bob-charlie-short.js
+```
+
+#### Step 3: Verification
+- ✅ Collection NFT created on blockchain
+- ✅ Candy Machine created with 5 items
+- ✅ Bob successfully minted NFT #002
+- ✅ Charlie successfully minted NFT #003
+- ✅ Each user paid from their own wallet
+- ✅ NFTs are real on Solana devnet
+
+### 🚨 Issues Resolved
+
+1. **Candy Machine Empty Error** - Fixed by ensuring proper item configuration
+2. **Transaction Too Large** - Implemented batching for item insertion
+3. **Name Length Limit** - Shortened ticket names to fit 32-character limit
+4. **User Wallet Authentication** - Fixed Metaplex instance per user
+5. **Price Configuration** - Corrected solPayment guard configuration
 
 ## Setup
 

@@ -307,7 +307,7 @@ class CandyMachineService {
             });
             console.log('🎫 Adding items to Candy Machine...');
             const items = Array.from({ length: collection.maxTickets }, (_, i) => ({
-                name: `${collection.eventName} Ticket #${String(i + 1).padStart(3, '0')}`,
+                name: `Ticket #${String(i + 1).padStart(3, '0')}`,
                 uri: `https://api.etcha-candy.com/ticket-metadata/${collection.id}/${i + 1}`,
             }));
             console.log(`🎫 Adding ${items.length} items to Candy Machine...`);

@@ -355,6 +355,61 @@
       "candyMachineConfig": {
         "minted": 5
       }
+    },
+    {
+      "id": "collection_1761424406184_l9r6wxizg",
+      "name": "Bob & Charlie Test Collection",
+      "description": "Test collection for Bob and Charlie minting functionality",
+      "eventName": "Bob Charlie Test Event",
+      "eventCreator": "Test Platform",
+      "eventCreatorName": "Test Platform Creator",
+      "maxTickets": 100,
+      "ticketPrice": 0.1,
+      "eventDate": "2025-12-31T23:59:59Z",
+      "eventLocation": "Test Venue",
+      "imageUrl": "https://api.etcha-candy.com/images/test-collection.jpg",
+      "status": "active",
+      "createdAt": "2025-10-25T20:33:26.184Z",
+      "updatedAt": "2025-10-25T20:33:26.184Z",
+      "collectionNftAddress": "F9EfDjfLPw1LeUZBn3Fv9DiG6rYjySBugaCgD2a7FK5d"
+    },
+    {
+      "id": "collection_1761424601200_mjwjwo9cp",
+      "name": "Bob Charlie Small Test",
+      "description": "Small test collection for Bob and Charlie minting",
+      "eventName": "Bob Charlie Small Event",
+      "eventCreator": "Test Platform",
+      "eventCreatorName": "Test Platform Creator",
+      "maxTickets": 10,
+      "ticketPrice": 0.1,
+      "eventDate": "2025-12-31T23:59:59Z",
+      "eventLocation": "Test Venue",
+      "imageUrl": "https://api.etcha-candy.com/images/test-collection.jpg",
+      "status": "active",
+      "createdAt": "2025-10-25T20:36:41.200Z",
+      "updatedAt": "2025-10-25T20:36:41.200Z",
+      "collectionNftAddress": "3maQWT2LN3sFtuZxbv6hDgZGpi7eZ59Ua8PxAZ4k1o9z"
+    },
+    {
+      "id": "collection_1761424771087_lqluhspsk",
+      "name": "Short Test Collection",
+      "description": "Test collection with short event name",
+      "eventName": "Short Event",
+      "eventCreator": "Test Platform",
+      "eventCreatorName": "Test Platform Creator",
+      "maxTickets": 5,
+      "ticketPrice": 0.1,
+      "eventDate": "2025-12-31T23:59:59Z",
+      "eventLocation": "Test Venue",
+      "imageUrl": "https://api.etcha-candy.com/images/test-collection.jpg",
+      "status": "active",
+      "createdAt": "2025-10-25T20:39:31.087Z",
+      "updatedAt": "2025-10-25T20:40:27.275Z",
+      "collectionNftAddress": "EKhrs5SnA2DEpk2k3NZw8xPkXfyZPVF1fDnQecHD9v5t",
+      "candyMachineAddress": "8cUsfHj9vCCfDQCxykqQowZ5SjCzdRXma9y6ESnsVe6a",
+      "candyMachineConfig": {
+        "minted": 4
+      }
     }
   ]
 }
