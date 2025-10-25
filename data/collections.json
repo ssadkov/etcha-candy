@@ -241,6 +241,23 @@
       "createdAt": "2025-10-25T18:00:58.654Z",
       "updatedAt": "2025-10-25T18:00:58.654Z",
       "collectionNftAddress": "9RiPpuMwYZFaT54jz4qqQHMqonQEe3XQhdjRCSRhGX8m"
+    },
+    {
+      "id": "collection_1761415931477_3n5s7vsla",
+      "eventCreatorName": "Jupiter Cats Team",
+      "description": "Exclusive NFT collection featuring adorable Jupiter Cats exploring the Solana ecosystem!",
+      "ticketPrice": 0.5,
+      "imageUrl": "https://jupiter-cats.com/images/jupiter-cat-space.jpg",
+      "eventName": "Jupiter Cats Launch Event",
+      "name": "Solana Jupiter Cats Collection",
+      "eventCreator": "4ezFV6pcyYYT6HaFoK9vXoLrzZZ3bz5roD7eSkFLyqNV",
+      "maxTickets": 50,
+      "eventDate": "2024-12-15",
+      "eventLocation": "Jupiter Space Station",
+      "status": "active",
+      "createdAt": "2025-10-25T18:12:11.477Z",
+      "updatedAt": "2025-10-25T18:12:11.477Z",
+      "collectionNftAddress": "2EwQ5s4LG9zewK3DbWaSqEidZryex2S6Eea1dHEthtVa"
     }
   ]
 }
