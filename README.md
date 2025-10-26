@@ -317,22 +317,165 @@ API Request → Validate Data → Create Collection NFT → Save to JSON → Ret
 }
 ```
 
+## 📖 Creating Collections
+
+### How to Create a New Collection
+
+To create a new ticket collection, use the **Create Collection API**:
+
+#### API Endpoint
+```
+POST /api/collections
+```
+
+#### Request Body
+```json
+{
+  "name": "Your Event Name",
+  "description": "Event description",
+  "eventCreator": "Creator wallet address",
+  "eventCreatorName": "Creator Display Name",
+  "eventName": "Full Event Name",
+  "eventDate": "2025-03-15",
+  "eventLocation": "Venue or Online",
+  "ticketPrice": 0.25,
+  "maxTickets": 200,
+  "imageUrl": "https://your-image-url.com/image.png"
+}
+```
+
+#### Example Request
+```javascript
+const response = await fetch('http://localhost:3000/api/collections', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    name: 'Solana workshop',
+    description: 'Interactive workshop on Solana blockchain development',
+    eventCreator: 'Solana Foundation',
+    eventCreatorName: 'Solana Foundation',
+    eventName: 'Solana Workshop 2025',
+    eventDate: '2025-03-15',
+    eventLocation: 'Online',
+    ticketPrice: 0.25,
+    maxTickets: 200,
+    imageUrl: 'https://via.placeholder.com/512x512.png?text=Workshop'
+  }),
+});
+```
+
+#### Response Parameters
+
+The API returns important parameters for **accounting and tracking**:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "collection_1761507837674_w780dr9if",  // Internal collection ID
+    "name": "Solana workshop",
+    "eventCreator": "Solana Foundation",
+    "eventCreatorName": "Solana Foundation", 
+    "eventName": "Solana Workshop 2025",
+    "eventDate": "2025-03-15",
+    "eventLocation": "Online",
+    "ticketPrice": 0.25,
+    "maxTickets": 200,
+    "minted": 0,
+    "status": "active",
+    "collectionNftAddress": "Fs5LrF5yEZiPE1mqYjPzrZCZJeCdKekmQL6MKYLimN29",
+    "candyMachineAddress": null,  // Set after Candy Machine creation
+    "createdAt": "2025-01-26T07:43:57.674Z"
+  }
+}
+```
+
+#### Important Fields for Accounting
+
+1. **`id`** - Internal collection ID (use for all API calls)
+2. **`collectionNftAddress`** - On-chain Collection NFT address (for verification)
+3. **`candyMachineAddress`** - Candy Machine address (creates after setup)
+4. **`ticketPrice`** - Price in SOL for each ticket
+5. **`maxTickets`** - Total ticket supply
+6. **`minted`** - Number of already minted tickets
+7. **`status`** - Collection status (active/inactive)
+
+### Creating Candy Machine
+
+After creating the collection, create a Candy Machine:
+
+#### API Endpoint
+```
+POST /api/collections/:collectionId/candy-machine
+```
+
+#### Example
+```javascript
+const collectionId = 'collection_1761507837674_w780dr9if';
+const response = await fetch(`http://localhost:3000/api/collections/${collectionId}/candy-machine`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    maxSupply: 200,
+    price: 0.25
+  }),
+});
+```
+
+#### Response
+```json
+{
+  "success": true,
+  "data": {
+    "collectionId": "collection_1761507837674_w780dr9if",
+    "candyMachineAddress": "5gb2yAVS38gNHZAL1qx5N6t62iVe5vSjA91pZZUJB8yj",
+    "itemsAdded": 200,
+    "itemPrice": 0.25,
+    "status": "ready"
+  }
+}
+```
+
+---
+
+## 🎯 Recent Achievements
+
+### ✅ Solana Workshop Collection Created
+- **Collection ID:** `collection_1761507837674_w780dr9if`
+- **Collection NFT:** `Fs5LrF5yEZiPE1mqYjPzrZCZJeCdKekmQL6MKYLimN29`
+- **Candy Machine:** `5gb2yAVS38gNHZAL1qx5N6t62iVe5vSjA91pZZUJB8yj`
+- **Max Tickets:** 200
+- **Price:** 0.25 SOL per ticket
+- **Status:** Ready for minting
+
+### ✅ Secondary Market Working
+- **Auction House:** `FWYve9qBwuXePpZhWRy72UWydDadeDse4youJrix7Et1`
+- **Listings:** Bob has 1 active listing (0.5 SOL)
+- **Purchase:** Charlie successfully bought Bob's NFT
+- **Platform Fee:** 2.5% (goes to platform wallet)
+
+---
+
 ## 🚀 Next Development Steps
 
-### Phase 1: Candy Machine Integration
-- [ ] Create real Candy Machine for each collection
-- [ ] Configure minting parameters (price, supply, guards)
-- [ ] Link Candy Machine to Collection NFT
+### Phase 1: ✅ Candy Machine Integration (DONE)
+- [x] Create real Candy Machine for each collection
+- [x] Configure minting parameters (price, supply, guards)
+- [x] Link Candy Machine to Collection NFT
 
 ### Phase 2: Ticket Minting
-- [ ] Implement real ticket minting via Candy Machine
-- [ ] Add payment processing (SOL transfers)
-- [ ] Create individual ticket NFTs
+- [x] Implement real ticket minting via Candy Machine
+- [x] Add payment processing (SOL transfers)
+- [x] Create individual ticket NFTs
 
-### Phase 3: Secondary Market
-- [ ] Integrate Metaplex Auction House
-- [ ] Enable ticket reselling
-- [ ] Implement royalty distribution
+### Phase 3: ✅ Secondary Market (DONE)
+- [x] Integrate Metaplex Auction House
+- [x] Enable ticket reselling
+- [x] Implement royalty distribution
 
 ### Phase 4: Production Features
 - [ ] Database migration (PostgreSQL/MongoDB)
