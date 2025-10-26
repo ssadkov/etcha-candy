@@ -288,13 +288,25 @@ class CandyMachineService {
                     const collectionAddress = new web3_js_1.PublicKey(collection.collectionNftAddress);
                     return nfts
                         .filter(nft => nft.collection?.address.equals(collectionAddress))
-                        .map(nft => nft.address.toString());
+                        .map(nft => ({
+                        nftAddress: nft.address.toString(),
+                        solscanUrl: `https://explorer.solana.com/address/${nft.address.toString()}?cluster=devnet`,
+                        name: nft.name,
+                        symbol: nft.symbol,
+                        collection: nft.collection?.address.toString()
+                    }));
                 }
             }
             const platformWallet = this.solanaService.getKeypair().publicKey;
             return nfts
                 .filter(nft => nft.creators?.some(creator => creator.address.equals(platformWallet)))
-                .map(nft => nft.address.toString());
+                .map(nft => ({
+                nftAddress: nft.address.toString(),
+                solscanUrl: `https://explorer.solana.com/address/${nft.address.toString()}?cluster=devnet`,
+                name: nft.name,
+                symbol: nft.symbol,
+                collection: nft.collection?.address.toString()
+            }));
         }
         catch (error) {
             console.error('Error getting user tickets:', error);
@@ -315,7 +327,13 @@ class CandyMachineService {
             const platformWallet = this.solanaService.getKeypair().publicKey;
             return nfts
                 .filter(nft => nft.creators?.some(creator => creator.address.equals(platformWallet)))
-                .map(nft => nft.address.toString());
+                .map(nft => ({
+                nftAddress: nft.address.toString(),
+                solscanUrl: `https://explorer.solana.com/address/${nft.address.toString()}?cluster=devnet`,
+                name: nft.name,
+                symbol: nft.symbol,
+                collection: nft.collection?.address.toString()
+            }));
         }
         catch (error) {
             console.error('Error getting user tickets from platform:', error);

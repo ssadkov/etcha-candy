@@ -347,7 +347,7 @@ export class CandyMachineService {
     return this.testWallets;
   }
 
-  async getUserTickets(userWallet: string, collectionId?: string): Promise<string[]> {
+  async getUserTickets(userWallet: string, collectionId?: string): Promise<any[]> {
     try {
       const testWallet = this.getTestWallet(userWallet);
       if (!testWallet) {
@@ -369,7 +369,13 @@ export class CandyMachineService {
           const collectionAddress = new PublicKey(collection.collectionNftAddress);
           return nfts
             .filter(nft => nft.collection?.address.equals(collectionAddress))
-            .map(nft => nft.address.toString());
+            .map(nft => ({
+              nftAddress: nft.address.toString(),
+              solscanUrl: `https://explorer.solana.com/address/${nft.address.toString()}?cluster=devnet`,
+              name: nft.name,
+              symbol: nft.symbol,
+              collection: nft.collection?.address.toString()
+            }));
         }
       }
 
@@ -381,14 +387,20 @@ export class CandyMachineService {
             creator.address.equals(platformWallet)
           )
         )
-        .map(nft => nft.address.toString());
+        .map(nft => ({
+          nftAddress: nft.address.toString(),
+          solscanUrl: `https://explorer.solana.com/address/${nft.address.toString()}?cluster=devnet`,
+          name: nft.name,
+          symbol: nft.symbol,
+          collection: nft.collection?.address.toString()
+        }));
     } catch (error) {
       console.error('Error getting user tickets:', error);
       throw new Error(`Failed to get user tickets: ${(error as Error).message}`);
     }
   }
 
-  async getUserTicketsFromPlatform(userWallet: string): Promise<string[]> {
+  async getUserTicketsFromPlatform(userWallet: string): Promise<any[]> {
     try {
       const testWallet = this.getTestWallet(userWallet);
       if (!testWallet) {
@@ -411,7 +423,13 @@ export class CandyMachineService {
             creator.address.equals(platformWallet)
           )
         )
-        .map(nft => nft.address.toString());
+        .map(nft => ({
+          nftAddress: nft.address.toString(),
+          solscanUrl: `https://explorer.solana.com/address/${nft.address.toString()}?cluster=devnet`,
+          name: nft.name,
+          symbol: nft.symbol,
+          collection: nft.collection?.address.toString()
+        }));
     } catch (error) {
       console.error('Error getting user tickets from platform:', error);
       throw new Error(`Failed to get user tickets from platform: ${(error as Error).message}`);
