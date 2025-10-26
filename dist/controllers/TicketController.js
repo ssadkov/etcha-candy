@@ -300,6 +300,103 @@ class TicketController {
             });
         }
     }
+    async createMarketplace(req, res) {
+        try {
+            const auctionHouseAddress = await this.candyMachineService.createMarketplace();
+            res.json({
+                success: true,
+                data: {
+                    auctionHouseAddress,
+                },
+                message: 'Marketplace created successfully',
+            });
+        }
+        catch (error) {
+            console.error('Error creating marketplace:', error);
+            res.status(500).json({
+                success: false,
+                error: `Failed to create marketplace: ${error.message}`,
+            });
+        }
+    }
+    async listTicketForSale(req, res) {
+        try {
+            const { nftMintAddress, priceInSol, userWallet, auctionHouseAddress } = req.body;
+            if (!nftMintAddress || !priceInSol || !userWallet || !auctionHouseAddress) {
+                res.status(400).json({
+                    success: false,
+                    error: 'Missing required fields',
+                });
+                return;
+            }
+            const result = await this.candyMachineService.listTicketForSale(auctionHouseAddress, nftMintAddress, priceInSol, userWallet);
+            res.json({
+                success: true,
+                data: result,
+                message: 'Ticket listed successfully',
+            });
+        }
+        catch (error) {
+            console.error('Error listing ticket:', error);
+            res.status(500).json({
+                success: false,
+                error: `Failed to list ticket: ${error.message}`,
+            });
+        }
+    }
+    async buyTicketFromMarketplace(req, res) {
+        try {
+            const { listingAddress, userWallet, auctionHouseAddress } = req.body;
+            if (!listingAddress || !userWallet || !auctionHouseAddress) {
+                res.status(400).json({
+                    success: false,
+                    error: 'Missing required fields',
+                });
+                return;
+            }
+            const result = await this.candyMachineService.buyTicketFromMarketplace(auctionHouseAddress, listingAddress, userWallet);
+            res.json({
+                success: true,
+                data: result,
+                message: 'Ticket purchased successfully',
+            });
+        }
+        catch (error) {
+            console.error('Error buying ticket:', error);
+            res.status(500).json({
+                success: false,
+                error: `Failed to buy ticket: ${error.message}`,
+            });
+        }
+    }
+    async getActiveListings(req, res) {
+        try {
+            const { auctionHouseAddress } = req.params;
+            if (!auctionHouseAddress) {
+                res.status(400).json({
+                    success: false,
+                    error: 'Auction House address is required',
+                });
+                return;
+            }
+            const listings = await this.candyMachineService.getActiveListings(auctionHouseAddress);
+            res.json({
+                success: true,
+                data: {
+                    listings,
+                    count: listings.length,
+                },
+                message: `Found ${listings.length} active listing(s)`,
+            });
+        }
+        catch (error) {
+            console.error('Error getting listings:', error);
+            res.status(500).json({
+                success: false,
+                error: `Failed to get listings: ${error.message}`,
+            });
+        }
+    }
 }
 exports.TicketController = TicketController;
 //# sourceMappingURL=TicketController.js.map

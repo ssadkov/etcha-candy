@@ -17,6 +17,10 @@ function createRoutes(collectionController, ticketController) {
     router.get('/tickets/platform/:wallet', (req, res) => ticketController.getUserTicketsFromPlatform(req, res));
     router.post('/tickets/validate', (req, res) => ticketController.validateTicket(req, res));
     router.get('/test-wallets', (req, res) => ticketController.getTestWallets(req, res));
+    router.post('/marketplace/create', (req, res) => ticketController.createMarketplace(req, res));
+    router.post('/marketplace/list', (req, res) => ticketController.listTicketForSale(req, res));
+    router.post('/marketplace/buy', (req, res) => ticketController.buyTicketFromMarketplace(req, res));
+    router.get('/marketplace/listings/:auctionHouseAddress', (req, res) => ticketController.getActiveListings(req, res));
     return router;
 }
 //# sourceMappingURL=index.js.map

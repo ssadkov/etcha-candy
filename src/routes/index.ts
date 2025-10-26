@@ -29,5 +29,11 @@ export function createRoutes(
   // Test wallet routes
   router.get('/test-wallets', (req, res) => ticketController.getTestWallets(req, res));
 
+  // Marketplace routes (secondary sales)
+  router.post('/marketplace/create', (req, res) => ticketController.createMarketplace(req, res));
+  router.post('/marketplace/list', (req, res) => ticketController.listTicketForSale(req, res));
+  router.post('/marketplace/buy', (req, res) => ticketController.buyTicketFromMarketplace(req, res));
+  router.get('/marketplace/listings/:auctionHouseAddress', (req, res) => ticketController.getActiveListings(req, res));
+
   return router;
 }

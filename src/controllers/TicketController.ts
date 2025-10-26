@@ -2,7 +2,14 @@ import { Request, Response } from 'express';
 import { CandyMachineService } from '../services/CandyMachineService';
 import { CollectionService } from '../services/CollectionService';
 import { SolanaService } from '../services/SolanaService';
-import { MintTicketRequest, ValidateTicketRequest, ApiResponse, MintTicketResponse } from '../types';
+import { 
+  MintTicketRequest, 
+  ValidateTicketRequest, 
+  ApiResponse, 
+  MintTicketResponse,
+  ListTicketRequest,
+  BuyTicketRequest
+} from '../types';
 import Joi from 'joi';
 
 export class TicketController {
@@ -318,6 +325,138 @@ export class TicketController {
       res.status(500).json({
         success: false,
         error: `Failed to add items to Candy Machine: ${(error as Error).message}`,
+      } as ApiResponse);
+    }
+  }
+
+  // ==========================================
+  // MARKETPLACE ENDPOINTS (Secondary Sales)
+  // ==========================================
+
+  /**
+   * Create Auction House marketplace (one-time setup)
+   */
+  async createMarketplace(req: Request, res: Response): Promise<void> {
+    try {
+      const auctionHouseAddress = await this.candyMachineService.createMarketplace();
+      
+      res.json({
+        success: true,
+        data: {
+          auctionHouseAddress,
+        },
+        message: 'Marketplace created successfully',
+      } as ApiResponse);
+    } catch (error) {
+      console.error('Error creating marketplace:', error);
+      res.status(500).json({
+        success: false,
+        error: `Failed to create marketplace: ${(error as Error).message}`,
+      } as ApiResponse);
+    }
+  }
+
+  /**
+   * List NFT for sale
+   */
+  async listTicketForSale(req: Request, res: Response): Promise<void> {
+    try {
+      const { nftMintAddress, priceInSol, userWallet, auctionHouseAddress } = req.body;
+
+      if (!nftMintAddress || !priceInSol || !userWallet || !auctionHouseAddress) {
+        res.status(400).json({
+          success: false,
+          error: 'Missing required fields',
+        } as ApiResponse);
+        return;
+      }
+
+      const result = await this.candyMachineService.listTicketForSale(
+        auctionHouseAddress,
+        nftMintAddress,
+        priceInSol,
+        userWallet
+      );
+
+      res.json({
+        success: true,
+        data: result,
+        message: 'Ticket listed successfully',
+      } as ApiResponse);
+    } catch (error) {
+      console.error('Error listing ticket:', error);
+      res.status(500).json({
+        success: false,
+        error: `Failed to list ticket: ${(error as Error).message}`,
+      } as ApiResponse);
+    }
+  }
+
+  /**
+   * Buy NFT from marketplace
+   */
+  async buyTicketFromMarketplace(req: Request, res: Response): Promise<void> {
+    try {
+      const { listingAddress, userWallet, auctionHouseAddress } = req.body;
+
+      if (!listingAddress || !userWallet || !auctionHouseAddress) {
+        res.status(400).json({
+          success: false,
+          error: 'Missing required fields',
+        } as ApiResponse);
+        return;
+      }
+
+      const result = await this.candyMachineService.buyTicketFromMarketplace(
+        auctionHouseAddress,
+        listingAddress,
+        userWallet
+      );
+
+      res.json({
+        success: true,
+        data: result,
+        message: 'Ticket purchased successfully',
+      } as ApiResponse);
+    } catch (error) {
+      console.error('Error buying ticket:', error);
+      res.status(500).json({
+        success: false,
+        error: `Failed to buy ticket: ${(error as Error).message}`,
+      } as ApiResponse);
+    }
+  }
+
+  /**
+   * Get all active listings from marketplace
+   */
+  async getActiveListings(req: Request, res: Response): Promise<void> {
+    try {
+      const { auctionHouseAddress } = req.params;
+
+      if (!auctionHouseAddress) {
+        res.status(400).json({
+          success: false,
+          error: 'Auction House address is required',
+        } as ApiResponse);
+        return;
+      }
+
+      const listings = await this.candyMachineService.getActiveListings(auctionHouseAddress);
+
+      res.json({
+        success: true,
+        data: {
+          listings,
+          count: listings.length,
+        },
+        message: `Found ${listings.length} active listing(s)`,
+      } as ApiResponse);
+    } catch (error) {
+      console.error('Error getting listings:', error);
+      res.status(500).json({
+        success: false,
+        error: `Failed to get listings: ${(error as Error).message}`,
       } as ApiResponse);
     }
   }

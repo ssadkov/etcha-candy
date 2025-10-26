@@ -122,3 +122,27 @@ export interface ApiResponse<T = any> {
   error?: string;
   message?: string;
 }
+
+// Marketplace interfaces for secondary sales
+export interface ListTicketRequest {
+  nftMintAddress: string;
+  priceInSol: number;
+  userWallet: string;
+  auctionHouseAddress: string;
+}
+
+export interface ListTicketResponse {
+  listingAddress: string;
+  price: number;
+}
+
+export interface BuyTicketRequest {
+  listingAddress: string;
+  userWallet: string;
+  auctionHouseAddress: string;
+}
+
+export interface BuyTicketResponse {
+  purchaseAddress: string;
+  nftAddress: string;
+}

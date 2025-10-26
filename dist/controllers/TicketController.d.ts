@@ -15,5 +15,9 @@ export declare class TicketController {
     validateTicket(req: Request, res: Response): Promise<void>;
     getTestWallets(req: Request, res: Response): Promise<void>;
     addItemsToCandyMachine(req: Request, res: Response): Promise<void>;
+    createMarketplace(req: Request, res: Response): Promise<void>;
+    listTicketForSale(req: Request, res: Response): Promise<void>;
+    buyTicketFromMarketplace(req: Request, res: Response): Promise<void>;
+    getActiveListings(req: Request, res: Response): Promise<void>;
 }
 //# sourceMappingURL=TicketController.d.ts.map

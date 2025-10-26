@@ -1,4 +1,5 @@
 import { PublicKey, Keypair } from '@solana/web3.js';
+import { lamports, amount, toPublicKey } from '@metaplex-foundation/js';
 import { Collection, CandyMachineConfig, TestWallet } from '../types';
 import { SolanaService } from './SolanaService';
 import { CollectionService } from './CollectionService';
@@ -558,6 +559,198 @@ export class CandyMachineService {
       return new PublicKey(s).toBase58(); 
     } catch { 
       throw new Error(`Invalid public key-like value: ${s}`);
+    }
+  }
+
+  // ==========================================
+  // AUCTION HOUSE METHODS (Secondary Market)
+  // ==========================================
+
+  /**
+   * Create Auction House instance for marketplace (one-time setup)
+   */
+  async createMarketplace(): Promise<string> {
+    try {
+      console.log('🏪 Creating Auction House marketplace...');
+      const metaplex = this.solanaService.getMetaplex();
+      
+      const { auctionHouse } = await metaplex.auctionHouse().create({
+        sellerFeeBasisPoints: 250, // 2.5% marketplace fee
+        canChangeSalePrice: false,
+      });
+      
+      console.log('✅ Auction House created successfully!');
+      console.log('Auction House Address:', auctionHouse.address.toBase58());
+      
+      return auctionHouse.address.toBase58();
+    } catch (error) {
+      console.error('❌ Error creating Auction House:', error);
+      throw new Error(`Failed to create marketplace: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * List NFT for sale on marketplace
+   */
+  async listTicketForSale(
+    auctionHouseAddress: string,
+    nftMintAddress: string,
+    priceInSol: number,
+    userWallet: string
+  ): Promise<{ listingAddress: string; price: number }> {
+    try {
+      console.log('🏷️ Listing NFT for sale...');
+      console.log('Auction House:', auctionHouseAddress);
+      console.log('NFT:', nftMintAddress);
+      console.log('Price:', priceInSol, 'SOL');
+      
+      const testWallet = this.getTestWallet(userWallet);
+      if (!testWallet) {
+        throw new Error('Wallet not found');
+      }
+      
+      const userKeypair = this.createKeypairFromPrivateKey(testWallet.privateKey);
+      const userMetaplex = this.solanaService.createMetaplexForUser(userKeypair);
+      
+      // Get Auction House model
+      const auctionHouse = await userMetaplex.auctionHouse().findByAddress({
+        address: new PublicKey(auctionHouseAddress),
+      });
+      
+      // Get the seller wallet address
+      const sellerAddress = userKeypair.publicKey;
+      
+      // List NFT for sale
+      console.log('🔍 Creating listing for NFT:', nftMintAddress);
+      console.log('   Seller:', sellerAddress.toBase58());
+      
+      const { listing } = await userMetaplex.auctionHouse().list({
+        auctionHouse,
+        mintAccount: new PublicKey(nftMintAddress),
+        seller: userKeypair,
+        price: lamports(priceInSol * 1e9), // Convert SOL to lamports
+      });
+      
+      console.log('✅ NFT listed successfully!');
+      console.log('Listing Address:', listing.tradeStateAddress.toBase58());
+      
+      return {
+        listingAddress: listing.tradeStateAddress.toBase58(),
+        price: priceInSol,
+      };
+    } catch (error) {
+      console.error('❌ Error listing NFT:', error);
+      throw new Error(`Failed to list NFT: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Buy NFT from marketplace (instant purchase)
+   */
+  async buyTicketFromMarketplace(
+    auctionHouseAddress: string,
+    listingAddress: string,
+    userWallet: string
+  ): Promise<{ purchaseAddress: string; nftAddress: string }> {
+    try {
+      console.log('🛒 Buying NFT from marketplace...');
+      console.log('Auction House:', auctionHouseAddress);
+      console.log('Listing:', listingAddress);
+      
+      const testWallet = this.getTestWallet(userWallet);
+      if (!testWallet) {
+        throw new Error('Wallet not found');
+      }
+      
+      const userKeypair = this.createKeypairFromPrivateKey(testWallet.privateKey);
+      const userMetaplex = this.solanaService.createMetaplexForUser(userKeypair);
+      
+      // Get Auction House model
+      const auctionHouse = await userMetaplex.auctionHouse().findByAddress({
+        address: new PublicKey(auctionHouseAddress),
+      });
+      
+      // Find the listing
+      const lazyListing = await userMetaplex.auctionHouse().findListingByTradeState({
+        auctionHouse,
+        tradeStateAddress: new PublicKey(listingAddress),
+      });
+      
+      // Load the full listing
+      const listing = (lazyListing as any).model !== 'listing' 
+        ? await userMetaplex.auctionHouse().loadListing({ lazyListing } as any)
+        : lazyListing;
+      
+      console.log('💰 Listing price:', listing.price.basisPoints.toNumber() / 1e9, 'SOL');
+      
+      // Check buyer balance
+      const buyerBalance = await this.solanaService.getConnection().getBalance(userKeypair.publicKey);
+      const buyerBalanceSOL = buyerBalance / 1e9;
+      const listingPrice = listing.price.basisPoints.toNumber() / 1e9;
+      
+      if (buyerBalanceSOL < listingPrice) {
+        throw new Error(`Insufficient SOL balance. Required: ${listingPrice} SOL, Available: ${buyerBalanceSOL} SOL`);
+      }
+      
+      // Create bid and execute sale directly
+      const { purchase } = await userMetaplex.auctionHouse().buy({
+        auctionHouse,
+        listing,
+        buyer: userKeypair,
+      });
+      
+      console.log('✅ NFT purchased successfully!');
+      
+      // Get NFT address from the asset
+      const nftAddress = (listing as any).asset.address.toBase58();
+      console.log('NFT Address:', nftAddress);
+      
+      return {
+        purchaseAddress: (purchase as any).receiptAddress?.toBase58() || 'purchase-receipt',
+        nftAddress: nftAddress,
+      };
+    } catch (error) {
+      console.error('❌ Error buying NFT:', error);
+      throw new Error(`Failed to buy NFT: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Get all active listings from marketplace
+   */
+  async getActiveListings(auctionHouseAddress: string): Promise<any[]> {
+    try {
+      const metaplex = this.solanaService.getMetaplex();
+      
+      // Get Auction House model
+      const auctionHouse = await metaplex.auctionHouse().findByAddress({
+        address: new PublicKey(auctionHouseAddress),
+      });
+      
+      const listings = await metaplex.auctionHouse().findListings({
+        auctionHouse,
+      });
+      
+      // Load full listing details for each lazy listing
+      const loadedListings = await Promise.all(
+        listings.map(async (lazyListing: any) => {
+          if (lazyListing.model === 'listing') {
+            return lazyListing;
+          }
+          return await metaplex.auctionHouse().loadListing({ lazyListing } as any);
+        })
+      );
+      
+      return loadedListings.map((listing: any) => ({
+        listingAddress: listing.tradeStateAddress.toBase58(),
+        nftAddress: (listing.asset as any)?.address?.toBase58() || listing.metadataAddress?.toBase58() || 'unknown',
+        price: listing.price.basisPoints.toNumber() / 1e9, // Convert to SOL
+        seller: listing.sellerAddress.toBase58(),
+        createdAt: listing.createdAt,
+      }));
+    } catch (error) {
+      console.error('Error getting listings:', error);
+      throw new Error(`Failed to get listings: ${(error as Error).message}`);
     }
   }
 }

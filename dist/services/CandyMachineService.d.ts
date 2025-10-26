@@ -23,5 +23,15 @@ export declare class CandyMachineService {
     private getCollectionById;
     addItemsToCandyMachine(candyMachineAddress: string, collection: Collection): Promise<void>;
     private asBase58Address;
+    createMarketplace(): Promise<string>;
+    listTicketForSale(auctionHouseAddress: string, nftMintAddress: string, priceInSol: number, userWallet: string): Promise<{
+        listingAddress: string;
+        price: number;
+    }>;
+    buyTicketFromMarketplace(auctionHouseAddress: string, listingAddress: string, userWallet: string): Promise<{
+        purchaseAddress: string;
+        nftAddress: string;
+    }>;
+    getActiveListings(auctionHouseAddress: string): Promise<any[]>;
 }
 //# sourceMappingURL=CandyMachineService.d.ts.map
