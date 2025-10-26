@@ -559,6 +559,24 @@
       "candyMachineConfig": {
         "minted": 3
       }
+    },
+    {
+      "id": "collection_1761507837674_w780dr9if",
+      "name": "Solana workshop",
+      "description": "Interactive workshop on Solana blockchain development",
+      "eventCreator": "Solana Foundation",
+      "eventCreatorName": "Solana Foundation",
+      "eventName": "Solana Workshop 2025",
+      "eventDate": "2025-03-15",
+      "eventLocation": "Online",
+      "maxTickets": 200,
+      "ticketPrice": 0.25,
+      "imageUrl": "https://via.placeholder.com/512x512.png?text=Solana+Workshop",
+      "status": "active",
+      "createdAt": "2025-10-26T19:43:57.674Z",
+      "updatedAt": "2025-10-26T19:45:25.361Z",
+      "collectionNftAddress": "Fs5LrF5yEZiPE1mqYjPzrZCZJeCdKekmQL6MKYLimN29",
+      "candyMachineAddress": "5gb2yAVS38gNHZAL1qx5N6t62iVe5vSjA91pZZUJB8yj"
     }
   ]
 }

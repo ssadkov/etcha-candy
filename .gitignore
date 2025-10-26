@@ -6,3 +6,4 @@ node_modules
 !package-lock.json
 !tsconfig.json
 data/test-wallets.json
+platform-wallet.json
