@@ -1,0 +1,18 @@
+collection_1761509102908_5mw3h07tz
+{
+  "id": "collection_1761509102908_5mw3h07tz",
+  "name": "Solana workshop",
+  "description": "Interactive workshop on Solana blockchain development",
+  "eventCreator": "Solana Foundation",
+  "eventCreatorName": "Solana Foundation",
+  "eventName": "Solana Workshop 2025",
+  "eventDate": "2025-03-15",
+  "eventLocation": "Online",
+  "ticketPrice": 0.25,
+  "maxTickets": 200,
+  "imageUrl": "https://via.placeholder.com/512x512.png?text=Solana+Workshop",
+  "status": "active",
+  "createdAt": "2025-10-26T20:05:02.908Z",
+  "updatedAt": "2025-10-26T20:05:02.908Z",
+  "collectionNftAddress": "bA4gzzLDwTnpnLedLHL1L2g34GDDsBYxZUEoNhem9qB"
+}
